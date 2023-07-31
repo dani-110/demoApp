@@ -5,34 +5,24 @@ import {styles} from '../../shared/styles';
 import {Card, Input, Layout, Text} from '@ui-kitten/components';
 import {TaskList} from '../../@types';
 import axios from 'axios';
-import {useLocalStorage} from '../../hooks/useLocalStorage';
+import useLocalStorage from '../../hooks/useLocalStorage';
 import moment from 'moment';
-// import axios from '../../api/apiMethods';
-
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'First Item',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Second Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Third Item',
-  },
-];
 
 export const ListView = ({}): React.ReactElement => {
-  const [List, setList] = useState<Array<TaskList>>([]);
-  const [Lists, setLists] = useLocalStorage('taskList', []);
+  const [list, setList] = useLocalStorage<Array<TaskList>>('taskList', []);
+  const [Name, setName] = useState("")
+  const [data, setData] = useState(list)
+ 
+  useEffect(() => {
+    if( Name.length>1)
+    setData(list.filter(x=>x.title.toLowerCase().includes(Name.toLowerCase())))
+    else
+    setData(list)
+  }, [Name,list]);
+  
 
   useEffect(() => {
-    // getList();
-    // if (!Lists) {
     getList();
-    // }
   }, []);
 
   const getList = async () => {
@@ -41,16 +31,17 @@ export const ListView = ({}): React.ReactElement => {
       // let arr: any[] = [];
       res.data.forEach((e: TaskList) => {
         startDate.setDate(startDate.getDate() + 1);
-        List.push({
+        list.push({
           ...e,
           date: moment(startDate).format('MMMM Do, YYYY'),
         });
       });
-      setList(List.concat());
+      setList(list.concat());
       // setLists(arr);
     });
   };
 
+ 
   const Item = (props: any) => (
     <Card style={styles.card}>
       <View style={style.dashboardItemHeader}>
@@ -64,6 +55,8 @@ export const ListView = ({}): React.ReactElement => {
       </View>
     </Card>
   );
+  console.log(Name);
+  
 
   return (
     <SafeAreaLayout style={styles.safeArea} insets="top">
@@ -71,14 +64,15 @@ export const ListView = ({}): React.ReactElement => {
         <Input
           placeholder="Search"
           clearButtonMode="always"
-          // value={State["Name"]}
+          value={Name}
+          onChangeText={nextValue => setName(nextValue)}
           // accessoryLeft={renderSearchIcon}
           // accessoryRight={renderCloseIcon}
           // onChangeText={nextValue => onChange("Name", nextValue)}
         />
       </Layout>
       <FlatList
-        data={List}
+        data={data}
         renderItem={({item}) => <Item item={item} />}
         keyExtractor={item => item.id}
       />
