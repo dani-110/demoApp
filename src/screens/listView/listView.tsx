@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, ScrollView, StyleSheet, View} from 'react-native';
 import {SafeAreaLayout} from '../../components';
 import {styles} from '../../shared/styles';
@@ -12,46 +12,53 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const ListView = ({}): React.ReactElement => {
   const [list, setList] = useLocalStorage<Array<TaskList>>('taskList', []);
-  const [Name, setName] = useState("")
-  const [data, setData] = useState(list)
- 
-  useEffect(() => {
-    if( Name.length>1)
-    setData(list.filter(x=>x.title.toLowerCase().includes(Name.toLowerCase())))
-    else
-    setData(list)
-  }, [Name,list]);
-  
+  const [name, setName] = useState("")
+  const [data, setData] = useState<Array<TaskList>>([])
 
   useEffect(() => {
     const loadData =async() =>{
-      AsyncStorage.getItem('firstTime').then(res=>{}).catch(err=>{
+      AsyncStorage.getItem('taskList').then(res=>{
+        console.log("this is offline");
+        if(res){
+          setList(JSON.parse(res))
+          setData(JSON.parse(res))
+        }
+      }).catch(err=>{
         console.log(err);
-        AsyncStorage.setItem('firstTime','true').then(res=>{
+        console.log("this is online");
+        
+        AsyncStorage.setItem('taskList','true').then(res=>{
           getList();
         })
         })
     }
-    loadData
+    loadData()
   }, []);
 
   const getList = async () => {
     console.log('get list');
     await axios.get('https://jsonplaceholder.typicode.com/todos').then(res => {
       const startDate = new Date('2023-03-01');
-      // let arr: any[] = [];
-      res.data.forEach((e: TaskList) => {
-        startDate.setDate(startDate.getDate() + 1);
-        list.push({
-          ...e,
+
+      const mapList =res.data.map((todo:TaskList)=>{
+        return {
+          ...todo,
           date: moment(startDate).format('MMMM Do, YYYY'),
-        });
-      });
-      setList(list.concat());
+        }
+      })
+      setList(mapList);
+      setData(mapList);
       // setLists(arr);
     });
   };
+  useEffect(() => {
+    setData(list.filter(x=>x.title.toLowerCase().includes(name.toLowerCase())))
+  }, [name])
 
+  useEffect(() => {
+   setData(list)
+  }, [list])
+  
  
   const Item = (props: any) => (
     <Card style={styles.card}>
@@ -82,8 +89,8 @@ export const ListView = ({}): React.ReactElement => {
         <Input
           placeholder="Search"
           clearButtonMode="always"
-          value={Name}
-          onChangeText={nextValue => setName(nextValue)}
+          value={name}
+          onChangeText={setName}
           // accessoryLeft={renderSearchIcon}
           // accessoryRight={renderCloseIcon}
           // onChangeText={nextValue => onChange("Name", nextValue)}
