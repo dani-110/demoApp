@@ -2,11 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {FlatList, ScrollView, StyleSheet, View} from 'react-native';
 import {SafeAreaLayout} from '../../components';
 import {styles} from '../../shared/styles';
-import {Card, Input, Layout, Text} from '@ui-kitten/components';
+import {Button, Card, Input, Layout, Text} from '@ui-kitten/components';
 import {TaskList} from '../../@types';
 import axios from 'axios';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export const ListView = ({}): React.ReactElement => {
   const [list, setList] = useLocalStorage<Array<TaskList>>('taskList', []);
@@ -22,10 +24,19 @@ export const ListView = ({}): React.ReactElement => {
   
 
   useEffect(() => {
-    getList();
+    const loadData =async() =>{
+      AsyncStorage.getItem('firstTime').then(res=>{}).catch(err=>{
+        console.log(err);
+        AsyncStorage.setItem('firstTime','true').then(res=>{
+          getList();
+        })
+        })
+    }
+    loadData
   }, []);
 
   const getList = async () => {
+    console.log('get list');
     await axios.get('https://jsonplaceholder.typicode.com/todos').then(res => {
       const startDate = new Date('2023-03-01');
       // let arr: any[] = [];
@@ -50,12 +61,19 @@ export const ListView = ({}): React.ReactElement => {
         </Text>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text>{props.item.date}</Text>
-          <Text>{props.item.completed ? 'completed' : 'not completed'}</Text>
+          {/* <Text>{props.item.completed ? 'completed' : 'not completed'}</Text> */}
+          <Button onPress={() => {
+            console.log(props.item.completed)
+              setList((prev) =>
+              prev.map((item, i) =>
+                item.id === props.item.id ? { ...item, completed: !item.completed } : item
+              )
+            );
+          }} status={props.item.completed? 'success':'danger'} size="small">{props.item.completed ? 'completed' : 'not completed'}</Button>
         </View>
       </View>
     </Card>
   );
-  console.log(Name);
   
 
   return (
