@@ -22,10 +22,16 @@ export const ListView = ({}): React.ReactElement => {
     const loadData = async () => {
       AsyncStorage.getItem('taskList')
         .then(res => {
-          console.log('this is offline');
-          if (res) {
+          console.log('this is offline', null);
+          if (res != null) {
             setList(JSON.parse(res));
             setData(JSON.parse(res));
+          } else {
+            console.log('this is online');
+
+            AsyncStorage.setItem('taskList', 'true').then(res => {
+              getList();
+            });
           }
         })
         .catch(err => {
@@ -44,14 +50,15 @@ export const ListView = ({}): React.ReactElement => {
     console.log('get list');
     await axios.get('https://jsonplaceholder.typicode.com/todos').then(res => {
       const startDate = new Date('2023-03-01');
-
       const mapList = res.data.map((todo: TaskList) => {
-        startDate.setDate(startDate.getDate() + 1);
+        let date = startDate.setDate(startDate.getDate() + 1);
+
+        console.log(typeof new Date(date));
         return {
           ...todo,
-          date: startDate,
-          start: startDate,
-          end: startDate,
+          date: date,
+          start: date,
+          end: date,
         };
       });
       setList(mapList);
@@ -98,7 +105,8 @@ export const ListView = ({}): React.ReactElement => {
     </Card>
   );
   const toggleFilterModal = (): void => {
-    setFilterModalVisible(!filterModalVisible);
+    AsyncStorage.removeItem('taskList');
+    // setFilterModalVisible(!filterModalVisible);
   };
   return (
     <SafeAreaLayout style={styles.safeArea} insets="top">
