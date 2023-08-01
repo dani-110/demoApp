@@ -54,9 +54,9 @@ export const ListView = ({}): React.ReactElement => {
         startDate.setDate(startDate.getDate() + index);
         return {
           ...todo,
-          date: date,
-          start: date,
-          end: date,
+          date: startDate,
+          start: startDate,
+          end: startDate,
         };
       });
       setList(mapList);
