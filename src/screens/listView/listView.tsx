@@ -17,7 +17,6 @@ export const ListView = ({}): React.ReactElement => {
   const [filterModalVisible, setFilterModalVisible] =
     React.useState<boolean>(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-
   useEffect(() => {
     const loadData = async () => {
       AsyncStorage.getItem('taskList')
@@ -26,13 +25,17 @@ export const ListView = ({}): React.ReactElement => {
           if (res) {
             setList(JSON.parse(res));
             setData(JSON.parse(res));
+          } else {
+            AsyncStorage.setItem('firstTime', 'true').then(res => {
+              getList();
+            });
           }
         })
         .catch(err => {
           console.log(err);
           console.log('this is online');
 
-          AsyncStorage.setItem('taskList', 'true').then(res => {
+          AsyncStorage.setItem('firstTime', 'true').then(res => {
             getList();
           });
         });

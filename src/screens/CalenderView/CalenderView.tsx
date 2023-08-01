@@ -16,6 +16,10 @@ import {TaskList} from '../../@types';
 export const CalenderView = ({}): React.ReactElement => {
   const [list, setList] = useLocalStorage<Array<TaskList>>('taskList', []);
   const [SelectedDate, setSelectedDate] = React.useState(new Date());
+  console.log(
+    list.slice(0, 3).map(item => ({...item, start: new Date(item.start)})),
+  );
+
   const events = [
     {
       title: 'Meeting',
@@ -40,7 +44,13 @@ export const CalenderView = ({}): React.ReactElement => {
 
       <Calendar
         height={300}
-        events={list}
+        events={
+          list.length > 0
+            ? list
+                .slice(0, 3)
+                .map(item => ({...item, start: new Date(item.start)}))
+            : events
+        }
         date={SelectedDate}
         overlapOffset={100}
         eventMinHeightForMonthView={20}
