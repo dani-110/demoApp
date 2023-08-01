@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   Dimensions,
   RecursiveArray,
@@ -15,23 +15,25 @@ import {TaskList} from '../../@types';
 
 export const CalenderView = ({}): React.ReactElement => {
   const [list, setList] = useLocalStorage<Array<TaskList>>('taskList', []);
+  const [events, setEvents] = React.useState<Array<TaskList>>([]);
   const [SelectedDate, setSelectedDate] = React.useState(new Date());
-  console.log(
-    list.slice(0, 3).map(item => ({...item, start: new Date(item.start)})),
-  );
 
-  const events = [
-    {
-      title: 'Meeting',
-      start: new Date(),
-      end: new Date(),
-    },
-    {
-      title: 'Coffee break',
-      start: new Date(),
-      end: new Date(),
-    },
-  ];
+  useEffect(() => {
+    setEvents(
+      list.slice(0, 30).map(item => ({...item, start: new Date(item.start)})),
+    );
+  }, [list]);
+  // useEffect(() => {
+  //   setEvents(
+  //     list
+  //       .map(item => ({...item, start: new Date(item.start)}))
+  //       .filter(
+  //         x =>
+  //           x.start.getMonth() === SelectedDate.getMonth() &&
+  //           x.start.getFullYear() === SelectedDate.getFullYear(),
+  //       ),
+  //   );
+  // }, [SelectedDate]);
 
   return (
     <SafeAreaLayout style={styles.safeArea} insets="top">
@@ -44,11 +46,7 @@ export const CalenderView = ({}): React.ReactElement => {
 
       <Calendar
         height={300}
-        events={
-          list.length > 0
-            ? list.map(item => ({...item, start: new Date(item.start)}))
-            : events
-        }
+        events={events}
         date={SelectedDate}
         overlapOffset={100}
         eventMinHeightForMonthView={20}

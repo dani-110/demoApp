@@ -17,6 +17,7 @@ export const ListView = ({}): React.ReactElement => {
   const [filterModalVisible, setFilterModalVisible] =
     React.useState<boolean>(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
+  // AsyncStorage.removeItem('taskList');
   useEffect(() => {
     const loadData = async () => {
       AsyncStorage.getItem('taskList')
@@ -46,10 +47,9 @@ export const ListView = ({}): React.ReactElement => {
   const getList = async () => {
     console.log('get list');
     await axios.get('https://jsonplaceholder.typicode.com/todos').then(res => {
-      const startDate = new Date('2023-03-01');
-
-      const mapList = res.data.map((todo: TaskList) => {
-        startDate.setDate(startDate.getDate() + 1);
+      const mapList = res.data.map((todo: TaskList, index: number) => {
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() + index);
         return {
           ...todo,
           date: startDate,
