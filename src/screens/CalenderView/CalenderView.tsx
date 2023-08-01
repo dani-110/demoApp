@@ -46,9 +46,7 @@ export const CalenderView = ({}): React.ReactElement => {
         height={300}
         events={
           list.length > 0
-            ? list
-                .slice(0, 3)
-                .map(item => ({...item, start: new Date(item.start)}))
+            ? list.map(item => ({...item, start: new Date(item.start)}))
             : events
         }
         date={SelectedDate}

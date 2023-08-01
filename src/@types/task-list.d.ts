@@ -5,4 +5,6 @@ export interface TaskList {
   title: string;
   completed: boolean;
   date: string;
+  start: Date;
+  end: Date;
 }
