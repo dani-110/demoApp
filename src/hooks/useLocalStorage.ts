@@ -1,10 +1,7 @@
-import {useState, useEffect} from 'react';
+import  { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const useLocalStorage = <T,>(
-  key: string,
-  initialValue: T,
-): [T, (value: T | ((prevValue: T) => T)) => Promise<void>] => {
+const useLocalStorage = <T>(key: string, initialValue: T): [T, (value: T | ((prevValue: T) => T)) => Promise<void>] => {
   const [storedValue, setStoredValue] = useState<T>(initialValue);
 
   useEffect(() => {
@@ -24,8 +21,7 @@ const useLocalStorage = <T,>(
 
   const setValue = async (value: T | ((prevValue: T) => T)) => {
     try {
-      const valueToStore =
-        value instanceof Function ? (value as Function)(storedValue) : value;
+      const valueToStore = value instanceof Function ? (value as Function)(storedValue) : value;
       setStoredValue(valueToStore);
       await AsyncStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
