@@ -1,55 +1,73 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, ScrollView, StyleSheet, View} from 'react-native';
 import {SafeAreaLayout} from '../../components';
 import {styles} from '../../shared/styles';
-import {Card, Input, Layout, Text} from '@ui-kitten/components';
+import {Button, Card, Input, Layout, Text} from '@ui-kitten/components';
 import {TaskList} from '../../@types';
 import axios from 'axios';
-import {useLocalStorage} from '../../hooks/useLocalStorage';
+import useLocalStorage from '../../hooks/useLocalStorage';
 import moment from 'moment';
-// import axios from '../../api/apiMethods';
-
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'First Item',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Second Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Third Item',
-  },
-];
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {CreateTaskModal} from '../../model';
 
 export const ListView = ({}): React.ReactElement => {
-  const [List, setList] = useState<Array<TaskList>>([]);
-  const [Lists, setLists] = useLocalStorage('taskList', []);
+  const [list, setList] = useLocalStorage<Array<TaskList>>('taskList', []);
+  const [name, setName] = useState('');
+  const [data, setData] = useState<Array<TaskList>>([]);
+  const [filterModalVisible, setFilterModalVisible] =
+    React.useState<boolean>(false);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
 
   useEffect(() => {
-    // getList();
-    // if (!Lists) {
-    getList();
-    // }
+    const loadData = async () => {
+      AsyncStorage.getItem('taskList')
+        .then(res => {
+          console.log('this is offline');
+          if (res) {
+            setList(JSON.parse(res));
+            setData(JSON.parse(res));
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          console.log('this is online');
+
+          AsyncStorage.setItem('taskList', 'true').then(res => {
+            getList();
+          });
+        });
+    };
+    loadData();
   }, []);
 
   const getList = async () => {
+    console.log('get list');
     await axios.get('https://jsonplaceholder.typicode.com/todos').then(res => {
       const startDate = new Date('2023-03-01');
-      // let arr: any[] = [];
-      res.data.forEach((e: TaskList) => {
+
+      const mapList = res.data.map((todo: TaskList) => {
         startDate.setDate(startDate.getDate() + 1);
-        List.push({
-          ...e,
-          date: moment(startDate).format('MMMM Do, YYYY'),
-        });
+        return {
+          ...todo,
+          date: startDate,
+          start: startDate,
+          end: startDate,
+        };
       });
-      setList(List.concat());
+      setList(mapList);
+      setData(mapList);
       // setLists(arr);
     });
   };
+  useEffect(() => {
+    setData(
+      list.filter(x => x.title.toLowerCase().includes(name.toLowerCase())),
+    );
+  }, [name]);
+
+  useEffect(() => {
+    setData(list);
+  }, [list]);
 
   const Item = (props: any) => (
     <Card style={styles.card}>
@@ -58,27 +76,56 @@ export const ListView = ({}): React.ReactElement => {
           {props.item.title}
         </Text>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text>{props.item.date}</Text>
-          <Text>{props.item.completed ? 'completed' : 'not completed'}</Text>
+          <Text>{moment(props.item.date).format('MMMM Do, YYYY')}</Text>
+          {/* <Text>{props.item.completed ? 'completed' : 'not completed'}</Text> */}
+          <Button
+            onPress={() => {
+              console.log(props.item.completed);
+              setList(prev =>
+                prev.map((item, i) =>
+                  item.id === props.item.id
+                    ? {...item, completed: !item.completed}
+                    : item,
+                ),
+              );
+            }}
+            status={props.item.completed ? 'success' : 'danger'}
+            size="small">
+            {props.item.completed ? 'completed' : 'not completed'}
+          </Button>
         </View>
       </View>
     </Card>
   );
-
+  const toggleFilterModal = (): void => {
+    setFilterModalVisible(!filterModalVisible);
+  };
   return (
     <SafeAreaLayout style={styles.safeArea} insets="top">
-      <Layout style={{margin: 5}}>
+      <Layout style={{margin: 5, flexDirection: 'row'}}>
         <Input
           placeholder="Search"
           clearButtonMode="always"
-          // value={State["Name"]}
+          value={name}
+          onChangeText={setName}
+          style={{flex: 1}}
           // accessoryLeft={renderSearchIcon}
           // accessoryRight={renderCloseIcon}
           // onChangeText={nextValue => onChange("Name", nextValue)}
         />
+        <Button onPress={toggleFilterModal} appearance="ghost">
+          Create
+        </Button>
+        <CreateTaskModal
+          visible={filterModalVisible}
+          onBackdropPress={toggleFilterModal}
+          onGotItButtonPress={toggleFilterModal}
+          selectedIndex={selectedIndex}
+          setSelectedIndex={setSelectedIndex}
+        />
       </Layout>
       <FlatList
-        data={List}
+        data={data}
         renderItem={({item}) => <Item item={item} />}
         keyExtractor={item => item.id}
       />
