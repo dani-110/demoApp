@@ -1,51 +1,14 @@
-import React, {useEffect} from 'react';
-import {
-  Dimensions,
-  RecursiveArray,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import React from 'react';
+import {StyleSheet} from 'react-native';
 import {CalendarIcon, SafeAreaLayout} from '../../components';
-import {Calendar, EventRenderer} from 'react-native-big-calendar';
+import {Calendar} from 'react-native-big-calendar';
 import useLocalStorage from '../../hooks/useLocalStorage';
-import {Datepicker, Divider, ListItem} from '@ui-kitten/components';
+import {Datepicker, Divider} from '@ui-kitten/components';
 import {TaskList} from '../../@types';
-
-interface ICalendarEventBase {
-  start: Date;
-  end: Date;
-  title: string;
-}
 
 export const CalenderView = ({}): React.ReactElement => {
   const [list, setList] = useLocalStorage<Array<TaskList>>('taskList', []);
-  const [Data, setData] = React.useState<Array<ICalendarEventBase>>([]);
   const [SelectedDate, setSelectedDate] = React.useState(new Date());
-  const events = [
-    {
-      title: 'Meeting',
-      start: new Date(),
-      end: new Date(),
-    },
-    {
-      title: 'Coffee break',
-      start: new Date(),
-      end: new Date(),
-    },
-  ];
-  // list.map(e => console.log(typeof e.date, typeof new Date()));
-  useEffect(() => {
-    list.map(e => {
-      Data.push({
-        title: e.title,
-        start: new Date(e.start),
-        end: new Date(e.end),
-      });
-    });
-    setData(Data);
-  }, []);
 
   return (
     <SafeAreaLayout style={styles.safeArea} insets="top">
@@ -58,7 +21,11 @@ export const CalenderView = ({}): React.ReactElement => {
 
       <Calendar
         height={300}
-        events={Data}
+        events={
+          list.length > 0
+            ? list.map(item => ({...item, start: new Date(item.start)}))
+            : []
+        }
         date={SelectedDate}
         overlapOffset={100}
         eventMinHeightForMonthView={20}

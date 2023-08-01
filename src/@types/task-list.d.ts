@@ -4,7 +4,7 @@ export interface TaskList {
   id: string;
   title: string;
   completed: boolean;
-  date: Object;
-  start: Object;
-  end: Object;
+  date: string;
+  start: Date;
+  end: Date;
 }
