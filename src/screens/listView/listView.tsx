@@ -22,12 +22,14 @@ export const ListView = ({}): React.ReactElement => {
     const loadData = async () => {
       AsyncStorage.getItem('taskList')
         .then(res => {
-          console.log('this is offline');
-          if (res) {
+          console.log('this is offline', null);
+          if (res != null) {
             setList(JSON.parse(res));
             setData(JSON.parse(res));
           } else {
-            AsyncStorage.setItem('firstTime', 'true').then(res => {
+            console.log('this is online');
+
+            AsyncStorage.setItem('taskList', 'true').then(res => {
               getList();
             });
           }
@@ -36,7 +38,7 @@ export const ListView = ({}): React.ReactElement => {
           console.log(err);
           console.log('this is online');
 
-          AsyncStorage.setItem('firstTime', 'true').then(res => {
+          AsyncStorage.setItem('taskList', 'true').then(res => {
             getList();
           });
         });
@@ -52,9 +54,9 @@ export const ListView = ({}): React.ReactElement => {
         startDate.setDate(startDate.getDate() + index);
         return {
           ...todo,
-          date: startDate,
-          start: startDate,
-          end: startDate,
+          date: date,
+          start: date,
+          end: date,
         };
       });
       setList(mapList);
@@ -101,7 +103,8 @@ export const ListView = ({}): React.ReactElement => {
     </Card>
   );
   const toggleFilterModal = (): void => {
-    setFilterModalVisible(!filterModalVisible);
+    AsyncStorage.removeItem('taskList');
+    // setFilterModalVisible(!filterModalVisible);
   };
   return (
     <SafeAreaLayout style={styles.safeArea} insets="top">

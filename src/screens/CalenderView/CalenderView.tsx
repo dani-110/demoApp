@@ -8,9 +8,9 @@ import {
   ViewStyle,
 } from 'react-native';
 import {CalendarIcon, SafeAreaLayout} from '../../components';
-import {Calendar, EventRenderer} from 'react-native-big-calendar';
+import {Calendar} from 'react-native-big-calendar';
 import useLocalStorage from '../../hooks/useLocalStorage';
-import {Datepicker, Divider, ListItem} from '@ui-kitten/components';
+import {Datepicker, Divider} from '@ui-kitten/components';
 import {TaskList} from '../../@types';
 
 export const CalenderView = ({}): React.ReactElement => {
