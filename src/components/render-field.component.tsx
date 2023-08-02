@@ -1,29 +1,19 @@
-import {
-  CheckBox,
-  Datepicker,
-  Icon,
-  IndexPath,
-  Input,
-  Layout,
-  Select,
-  Text,
-} from '@ui-kitten/components';
+import {Datepicker, Icon, Input, Text} from '@ui-kitten/components';
 import {Field} from '../@types';
-import React, {useRef, useState, useEffect} from 'react';
-import {Image, TouchableWithoutFeedback, View} from 'react-native';
+import React, {useState} from 'react';
+import {TouchableWithoutFeedback} from 'react-native';
 import {styles} from '../shared/styles';
 import {CalendarIcon} from './icons';
 
 export interface RenderFieldProps {
   Field: Field;
   State: {};
-  clearState?: (key: string[]) => void;
   onChange: (key: string, value: string | boolean) => void;
 }
 export interface RenderIconProps {}
 
 export const RenderField = (props: RenderFieldProps): JSX.Element => {
-  const {Field, State, onChange, clearState} = props;
+  const {Field, State, onChange} = props;
   console.log(Field, 'Field, State ====>>>>');
   const [SecurePassword, setSecurePassword] = useState(true);
   const [IsEmailValid, setIsEmailValid] = useState(false);
@@ -41,14 +31,12 @@ export const RenderField = (props: RenderFieldProps): JSX.Element => {
     console.log(value);
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
     if (reg.test(value) === false) {
-      console.log('Email is Not Correct');
       setIsEmailValid(false);
       onChange(key, value);
       return false;
     } else {
       onChange(key, value);
       setIsEmailValid(true);
-      console.log('Email is Correct');
     }
   };
 

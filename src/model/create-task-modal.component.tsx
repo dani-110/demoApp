@@ -33,7 +33,6 @@ export const CreateTaskModal = (
   const [list, setList] = useLocalStorage<Array<TaskList>>('taskList', []);
 
   const onChange = (fieldKey: string, fieldValue: any) => {
-    console.log(fieldKey, fieldValue);
     const a = Object.assign({}, Task);
     a[fieldKey] = fieldValue;
     setTask(a);
@@ -46,7 +45,7 @@ export const CreateTaskModal = (
       start: Task.date,
       end: Task.date,
       completed: false,
-      id: list[list.length - 1].id + 1,
+      id: list[list.length - 1]?.id + 1,
       userId: 9,
     };
     setList([...list, obj]);

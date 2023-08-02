@@ -18,7 +18,6 @@ export const RenderFields = (props: RenderFieldsProps): JSX.Element => {
   //   const [Fields, setFields] = React.useState<Field[]>([]);
   const {Fields, State, onChange, setState, fullWidth} = props;
 
-  console.log('CHild renderd');
   const ClearState = (key: string[]) => {
     if (!setState) return;
     const a = Object.assign({}, State);
@@ -30,7 +29,6 @@ export const RenderFields = (props: RenderFieldsProps): JSX.Element => {
   return (
     <>
       {Fields?.map((Field: Field, x) => {
-        console.log(Field, State, 'Field ===>');
         return (
           <Layout
             key={x}

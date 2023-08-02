@@ -22,7 +22,7 @@ export const ListView = ({}): React.ReactElement => {
     const loadData = async () => {
       AsyncStorage.getItem('taskList')
         .then(res => {
-          console.log('this is offline', null);
+          console.log('this is offline');
           if (res != null) {
             setList(JSON.parse(res));
             setData(JSON.parse(res));
@@ -47,13 +47,11 @@ export const ListView = ({}): React.ReactElement => {
   }, []);
 
   const getList = async () => {
-    console.log('get list');
     await axios.get('https://jsonplaceholder.typicode.com/todos').then(res => {
       const startDate = new Date('2023-03-01');
       const mapList = res.data.map((todo: TaskList) => {
         let date = startDate.setDate(startDate.getDate() + 1);
 
-        console.log(typeof new Date(date));
         return {
           ...todo,
           date: date,
@@ -73,6 +71,7 @@ export const ListView = ({}): React.ReactElement => {
   }, [name]);
 
   useEffect(() => {
+    console.log('it should be run');
     setData(list);
   }, [list]);
 
@@ -83,30 +82,28 @@ export const ListView = ({}): React.ReactElement => {
           {props.item.title}
         </Text>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text>{moment(props.item.date).format('MMMM Do, YYYY')}</Text>
+          <Text>{moment(props.item?.date).format('MMMM Do, YYYY')}</Text>
           {/* <Text>{props.item.completed ? 'completed' : 'not completed'}</Text> */}
           <Button
             onPress={() => {
-              console.log(props.item.completed);
               setList(prev =>
                 prev.map((item, i) =>
                   item.id === props.item.id
-                    ? {...item, completed: !item.completed}
+                    ? {...item, completed: !item?.completed}
                     : item,
                 ),
               );
             }}
-            status={props.item.completed ? 'success' : 'danger'}
+            status={props.item?.completed ? 'success' : 'danger'}
             size="small">
-            {props.item.completed ? 'completed' : 'not completed'}
+            {props.item?.completed ? 'completed' : 'not completed'}
           </Button>
         </View>
       </View>
     </Card>
   );
   const toggleFilterModal = (): void => {
-    AsyncStorage.removeItem('taskList');
-    // setFilterModalVisible(!filterModalVisible);
+    setFilterModalVisible(!filterModalVisible);
   };
   return (
     <SafeAreaLayout style={styles.safeArea} insets="top">
