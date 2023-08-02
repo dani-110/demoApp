@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   RecursiveArray,
   StyleSheet,
@@ -14,6 +14,7 @@ import {TaskList} from '../../@types';
 
 export const CalenderView = ({}): React.ReactElement => {
   const [list, setList] = useLocalStorage<Array<TaskList>>('taskList', []);
+  const [events, setEvents] = React.useState<Array<TaskList>>([]);
   const [SelectedDate, setSelectedDate] = React.useState(new Date());
 
   const customEvent: EventRenderer = (event, touchableOpacityProps) => {
@@ -47,15 +48,16 @@ export const CalenderView = ({}): React.ReactElement => {
           )}
           accessoryLeft={event.icon}
         />
-        {/* <Layout style={{ display: 'flex', flexDirection: 'row', }}>
-                {event.icon}
-                <Text numberOfLines={1} style={{ fontSize: 9 }} category='s2'>{event.title}</Text>
-            </Layout> */}
-
-        {/* <Text numberOfLines={1} category='s2'>{event.icon}{event.title}</Text> */}
       </TouchableOpacity>
     );
   };
+  useEffect(() => {
+    setEvents(
+      list
+        .slice(150, 200)
+        .map(item => ({...item, start: new Date(item.start)})),
+    );
+  }, [list]);
   return (
     <SafeAreaLayout style={styles.safeArea} insets="top">
       <Datepicker
@@ -67,11 +69,7 @@ export const CalenderView = ({}): React.ReactElement => {
 
       <Calendar
         height={300}
-        events={
-          list.length > 0
-            ? list.map(item => ({...item, start: new Date(item.start)}))
-            : []
-        }
+        events={events}
         date={SelectedDate}
         renderEvent={customEvent}
         overlapOffset={100}

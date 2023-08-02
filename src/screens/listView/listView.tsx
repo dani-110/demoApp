@@ -17,7 +17,7 @@ export const ListView = ({}): React.ReactElement => {
   const [filterModalVisible, setFilterModalVisible] =
     React.useState<boolean>(false);
   const [selectedIndex, setSelectedIndex] = React.useState(0);
-
+  // AsyncStorage.removeItem('taskList');
   useEffect(() => {
     const loadData = async () => {
       AsyncStorage.getItem('taskList')
@@ -54,14 +54,13 @@ export const ListView = ({}): React.ReactElement => {
 
         return {
           ...todo,
-          date: date,
-          start: date,
-          end: date,
+          date: startDate,
+          start: startDate,
+          end: startDate,
         };
       });
       setList(mapList);
       setData(mapList);
-      // setLists(arr);
     });
   };
   useEffect(() => {
@@ -83,7 +82,6 @@ export const ListView = ({}): React.ReactElement => {
         </Text>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text>{moment(props.item?.date).format('MMMM Do, YYYY')}</Text>
-          {/* <Text>{props.item.completed ? 'completed' : 'not completed'}</Text> */}
           <Button
             onPress={() => {
               setList(prev =>
@@ -114,9 +112,6 @@ export const ListView = ({}): React.ReactElement => {
           value={name}
           onChangeText={setName}
           style={{flex: 1}}
-          // accessoryLeft={renderSearchIcon}
-          // accessoryRight={renderCloseIcon}
-          // onChangeText={nextValue => onChange("Name", nextValue)}
         />
         <Button onPress={toggleFilterModal} appearance="ghost">
           Create
@@ -140,14 +135,10 @@ export const ListView = ({}): React.ReactElement => {
 const style = StyleSheet.create({
   dashboardItemHeader: {
     paddingVertical: 16,
-    // flexDirection: 'row',
     justifyContent: 'flex-start',
     fontSize: 24,
-    // alignItems: 'center',
   },
   headerText: {
-    // fontSize: 16,
-    // fontWeight: '800',
     color: '#192126',
   },
 });
